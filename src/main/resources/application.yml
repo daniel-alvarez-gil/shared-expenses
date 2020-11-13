@@ -1,0 +1,18 @@
+micronaut:
+  application:
+    name: sharedExpenses
+datasources:
+  default:
+    driverClassName: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/dev
+    username: root
+    password: password
+jpa:
+  default:
+    entity-scan:
+      packages: 'shared.expenses'
+    properties:
+      hibernate:
+        hbm2ddl:
+          auto: update
+        show_sql: true
