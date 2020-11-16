@@ -9,6 +9,7 @@ import shared.expenses.repository.GroupExpenseRepository;
 import shared.expenses.service.GroupExpensesService;
 
 import javax.inject.Singleton;
+import javax.transaction.Transactional;
 import java.util.Hashtable;
 import java.util.Optional;
 

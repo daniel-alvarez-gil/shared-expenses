@@ -5,12 +5,11 @@ import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
 import io.micronaut.http.annotation.Post;
 import io.micronaut.http.annotation.Produces;
+import shared.expenses.dto.ConsumerDTO;
 import shared.expenses.pojo.Consumer;
-import shared.expenses.repository.ConsumerRepository;
 import shared.expenses.service.ConsumerService;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Set;
 
 @Controller("/consumer")
 public class ConsumerController {
@@ -23,7 +22,7 @@ public class ConsumerController {
 
     @Get("/")
     @Produces(MediaType.APPLICATION_JSON)
-    public List<Consumer> getConsumers() {
+    public Set<ConsumerDTO> getConsumers() {
         return consumerService.findAll();
     }
 

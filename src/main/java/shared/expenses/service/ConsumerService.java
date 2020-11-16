@@ -1,9 +1,9 @@
 package shared.expenses.service;
 
-import shared.expenses.pojo.Consumer;
+import shared.expenses.dto.ConsumerDTO;
 
-import java.util.List;
+import java.util.Set;
 
 public interface ConsumerService {
-    List<Consumer> findAll();
+    Set<ConsumerDTO> findAll();
 }

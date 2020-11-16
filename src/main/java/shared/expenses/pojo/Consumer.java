@@ -1,20 +1,27 @@
 package shared.expenses.pojo;
 
-import io.micronaut.data.annotation.MappedEntity;
-import io.micronaut.data.model.naming.NamingStrategies;
-import io.micronaut.data.model.naming.NamingStrategy;
-import lombok.Data;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import lombok.Getter;
+import lombok.Setter;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import javax.persistence.*;
+import java.util.Set;
 
-@Data
+@Getter
+@Setter
 @Entity
-@MappedEntity(namingStrategy = NamingStrategy.class)
 public class Consumer {
 
     @Id
     private Long id;
     private String name;
+
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinTable(name = "consumer_group",
+            joinColumns = {@JoinColumn(name = "consumer_id")},
+            inverseJoinColumns = {@JoinColumn(name = "group_id")})
+    @JsonIgnore
+    private Set<GroupExpenses> groups;
 }
 

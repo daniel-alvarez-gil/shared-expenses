@@ -1,12 +1,15 @@
 package shared.expenses.service.impl;
 
+import shared.expenses.dto.ConsumerDTO;
 import shared.expenses.pojo.Consumer;
 import shared.expenses.repository.ConsumerRepository;
 import shared.expenses.service.ConsumerService;
 
-import java.util.ArrayList;
-import java.util.List;
+import javax.inject.Singleton;
+import javax.transaction.Transactional;
+import java.util.*;
 
+@Singleton
 public class ConsumerServiceImpl implements ConsumerService {
 
     private final ConsumerRepository consumerRepository;
@@ -15,8 +18,22 @@ public class ConsumerServiceImpl implements ConsumerService {
         this.consumerRepository = consumerRepository;
     }
 
-    public List<Consumer> findAll() {
-        List<Consumer> result = consumerRepository.findAll();
-        return (!result.isEmpty()) ? result : new ArrayList<>();
+    @Transactional
+    public Set<ConsumerDTO> findAll() {
+        Set<ConsumerDTO> result = new HashSet<>();
+        for(Consumer consumer: consumerRepository.findAll()){
+            HashMap<Long, String> groups = new HashMap<>();
+            consumer.getGroups().forEach(group -> groups.put(group.getId(), group.getName()));
+
+            ConsumerDTO consumerDTO = ConsumerDTO.builder()
+                    .id(consumer.getId())
+                    .name(consumer.getName())
+                    .groups(groups)
+                    .build();
+
+            result.add(consumerDTO);
+        }
+
+        return result;
     }
 }
