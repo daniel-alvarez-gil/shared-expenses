@@ -7,6 +7,7 @@ import io.micronaut.http.annotation.Post;
 import io.micronaut.http.annotation.Produces;
 import shared.expenses.pojo.Consumer;
 import shared.expenses.repository.ConsumerRepository;
+import shared.expenses.service.ConsumerService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,17 +15,16 @@ import java.util.List;
 @Controller("/consumer")
 public class ConsumerController {
 
-    private final ConsumerRepository consumerRepository;
+    private final ConsumerService consumerService;
 
-    public ConsumerController(ConsumerRepository consumerRepository) {
-        this.consumerRepository = consumerRepository;
+    public ConsumerController(ConsumerService consumerService) {
+        this.consumerService = consumerService;
     }
 
     @Get("/")
     @Produces(MediaType.APPLICATION_JSON)
     public List<Consumer> getConsumers() {
-        List<Consumer> result = consumerRepository.findAll();
-        return (!result.isEmpty()) ? result : new ArrayList<>();
+        return consumerService.findAll();
     }
 
     @Post("/")

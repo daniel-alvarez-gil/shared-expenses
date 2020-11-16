@@ -11,7 +11,7 @@ import shared.expenses.service.GroupExpensesService;
 
 import java.util.List;
 
-@Controller("/ge/{groupExpensesId}/expenses")
+@Controller("/ge/{groupExpensesId}")
 public class GroupExpensesController {
 
     private final GroupExpensesService groupExpensesService;
@@ -20,13 +20,13 @@ public class GroupExpensesController {
         this.groupExpensesService = groupExpensesService;
     }
 
-    @Get("/")
+    @Get("/expenses")
     @Produces(MediaType.APPLICATION_JSON)
     public GroupExpensesInfoDTO getExpenses(Long groupExpensesId) {
         return groupExpensesService.listOrderByCreateTime(groupExpensesId);
     }
 
-    @Post("/")
+    @Post("/expenses")
     @Produces(MediaType.APPLICATION_JSON)
     public String createExpense(Expense expense) {
         return null;
