@@ -1,6 +1,5 @@
 package shared.expenses.service.impl;
 
-import org.graalvm.compiler.nodes.calc.IntegerDivRemNode;
 import shared.expenses.dto.ExpenseInfoDTO;
 import shared.expenses.dto.GroupExpensesInfoDTO;
 import shared.expenses.pojo.Consumer;
@@ -12,7 +11,6 @@ import shared.expenses.repository.GroupExpenseRepository;
 import shared.expenses.service.GroupExpensesService;
 
 import javax.inject.Singleton;
-import javax.swing.text.html.Option;
 import javax.transaction.Transactional;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -33,14 +31,12 @@ public class GroupExpensesServiceImpl implements GroupExpensesService {
 
     public GroupExpensesInfoDTO listOrderByCreateTime(Long groupExpensesId) {
         Optional<GroupExpenses> groupExpense = groupExpenseRepository.findById(groupExpensesId);
-        if (!groupExpense.isPresent())
-            return null;
+        return groupExpense.map(this::getGroupInfoOrderByCreateTime).orElse(null);
 
-        return getGroupInfoOrderByCreateTime(groupExpense.get());
     }
 
     @Transactional
-    public GroupExpensesInfoDTO addConsumerToGroup(Long groupExpensesId, Long consumerId){
+    public GroupExpensesInfoDTO addConsumerToGroup(Long groupExpensesId, Long consumerId) {
         Optional<GroupExpenses> optional = groupExpenseRepository.findById(groupExpensesId);
         if (!optional.isPresent())
             return null;
@@ -56,13 +52,11 @@ public class GroupExpensesServiceImpl implements GroupExpensesService {
         optional.get().getConsumers().forEach(c -> consumers.put(c.getId(), c.getName()));
         consumers.put(consumer.get().getId(), consumer.get().getName());
 
-        GroupExpensesInfoDTO groupExpensesInfoDTO = GroupExpensesInfoDTO.builder()
+        return GroupExpensesInfoDTO.builder()
                 .groupId(optional.get().getId())
                 .groupName(optional.get().getName())
                 .consumers(consumers)
                 .build();
-
-        return groupExpensesInfoDTO;
     }
 
     public GroupExpensesInfoDTO addExpense(Long groupExpensesId, Expense expense) {
@@ -77,7 +71,18 @@ public class GroupExpensesServiceImpl implements GroupExpensesService {
 
     private GroupExpensesInfoDTO getGroupInfoOrderByCreateTime(GroupExpenses groupExpense) {
         LinkedHashMap<Long, ExpenseInfoDTO> expensesList = new LinkedHashMap<>();
+        HashMap<String, Float> balance = new HashMap<>();
+        float totalExpenses = 0;
+
         for (Expense expense : expenseRepository.findAllOrderByCreateTimeDesc(groupExpense)) {
+            totalExpenses += expense.getAmount();
+            String key = expense.getPayer().getName();
+
+            if (balance.containsKey(key))
+                balance.replace(key, balance.get(key) + expense.getAmount());
+            else
+                balance.put(key, expense.getAmount());
+
             ExpenseInfoDTO expenseInfoDTO = ExpenseInfoDTO.builder()
                     .amount(expense.getAmount())
                     .description(expense.getDescription())
@@ -87,10 +92,14 @@ public class GroupExpensesServiceImpl implements GroupExpensesService {
             expensesList.put(expense.getId(), expenseInfoDTO);
         }
 
+        final float mean = totalExpenses / balance.size();
+        balance.forEach((k, v) -> balance.replace(k, balance.get(k) - mean));
+
         return GroupExpensesInfoDTO.builder()
                 .groupId(groupExpense.getId())
                 .groupName(groupExpense.getName())
                 .expensesList(expensesList)
+                .balance(balance)
                 .build();
     }
 

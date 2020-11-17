@@ -7,7 +7,9 @@ import shared.expenses.service.ConsumerService;
 
 import javax.inject.Singleton;
 import javax.transaction.Transactional;
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 @Singleton
 public class ConsumerServiceImpl implements ConsumerService {

@@ -2,7 +2,6 @@ package shared.expenses.dto;
 
 import lombok.Builder;
 import lombok.Data;
-import shared.expenses.pojo.Consumer;
 
 import java.util.HashMap;
 
@@ -13,4 +12,5 @@ public class GroupExpensesInfoDTO {
     private String groupName;
     private HashMap<Long, String> consumers;
     private HashMap<Long, ExpenseInfoDTO> expensesList;
+    private HashMap<String, Float> balance;
 }
