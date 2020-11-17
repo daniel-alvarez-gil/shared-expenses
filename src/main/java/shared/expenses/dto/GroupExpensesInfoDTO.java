@@ -2,13 +2,15 @@ package shared.expenses.dto;
 
 import lombok.Builder;
 import lombok.Data;
+import shared.expenses.pojo.Consumer;
 
-import java.util.Hashtable;
+import java.util.HashMap;
 
 @Data
 @Builder
 public class GroupExpensesInfoDTO {
     private Long groupId;
     private String groupName;
-    private Hashtable<Long, ExpenseInfoDTO> expensesList;
+    private HashMap<Long, String> consumers;
+    private HashMap<Long, ExpenseInfoDTO> expensesList;
 }

@@ -1,15 +1,13 @@
 package shared.expenses.controller;
 
+import io.micronaut.http.HttpResponse;
+import io.micronaut.http.HttpStatus;
 import io.micronaut.http.MediaType;
-import io.micronaut.http.annotation.Controller;
-import io.micronaut.http.annotation.Get;
-import io.micronaut.http.annotation.Post;
-import io.micronaut.http.annotation.Produces;
+import io.micronaut.http.annotation.*;
 import shared.expenses.dto.GroupExpensesInfoDTO;
 import shared.expenses.pojo.Expense;
+import shared.expenses.pojo.GroupExpenses;
 import shared.expenses.service.GroupExpensesService;
-
-import java.util.List;
 
 @Controller("/ge/{groupExpensesId}")
 public class GroupExpensesController {
@@ -28,7 +26,14 @@ public class GroupExpensesController {
 
     @Post("/expenses")
     @Produces(MediaType.APPLICATION_JSON)
-    public String createExpense(Expense expense) {
-        return null;
+    public HttpResponse<GroupExpensesInfoDTO> createExpense(Long groupExpensesId, @Body Expense expense) {
+        return HttpResponse
+                .created(groupExpensesService.addExpense(groupExpensesId, expense));
+    }
+
+    @Put("/consumer/{consumerId}")
+    public HttpResponse<GroupExpensesInfoDTO> addConsumerToGroup(Long groupExpensesId, Long consumerId) {
+        return HttpResponse
+                .created(groupExpensesService.addConsumerToGroup(groupExpensesId, consumerId));
     }
 }

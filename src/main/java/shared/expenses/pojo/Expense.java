@@ -2,10 +2,7 @@ package shared.expenses.pojo;
 
 import lombok.Data;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 import java.util.Date;
 
 @Data
@@ -13,6 +10,7 @@ import java.util.Date;
 public class Expense {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
 
     private float amount;
