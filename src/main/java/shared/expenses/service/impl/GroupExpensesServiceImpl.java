@@ -129,7 +129,7 @@ public class GroupExpensesServiceImpl implements GroupExpensesService {
         if (!Max_Value.equals(Min_Value)) {
             String Max_Key = Utils.getKeyFromValue(balance, Max_Value);
             String Min_Key = Utils.getKeyFromValue(balance, Min_Value);
-            float result = Utils.round(Max_Value + Min_Value, 2);
+            float result = Utils.round(Max_Value + Min_Value, 1);
             balance.remove(Max_Key);
             balance.remove(Min_Key);
             if (result >= ZERO) {
