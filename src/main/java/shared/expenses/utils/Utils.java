@@ -3,7 +3,6 @@ package shared.expenses.utils;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.HashMap;
-import java.util.Map;
 
 public class Utils {
 
@@ -17,16 +16,12 @@ public class Utils {
     }
 
     public static String getKeyFromValue(HashMap<String, Float> hm, Float value) {
-        for (Object o : hm.keySet()) {
+        for (String o : hm.keySet()) {
             if (hm.get(o).equals(value)) {
-                return o.toString();
+                return o;
             }
         }
         return null;
-    }
-
-    public static HashMap<String, Float> clone(Map<String, Float> original) {
-        return new HashMap<>(original);
     }
 
 }
