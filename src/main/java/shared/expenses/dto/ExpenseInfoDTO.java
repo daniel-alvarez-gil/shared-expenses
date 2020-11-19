@@ -2,7 +2,6 @@ package shared.expenses.dto;
 
 import lombok.Builder;
 import lombok.Data;
-import shared.expenses.pojo.Consumer;
 
 import java.util.Date;
 
@@ -13,6 +12,6 @@ public class ExpenseInfoDTO {
     private Float amount;
     private String description;
     private Date createTime;
-    private Consumer payer;
+    private ConsumerDTO payer;
 
 }

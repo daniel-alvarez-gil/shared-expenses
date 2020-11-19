@@ -8,8 +8,7 @@ import shared.expenses.service.ConsumerService;
 import javax.inject.Singleton;
 import javax.transaction.Transactional;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.Optional;
 
 @Singleton
 public class ConsumerServiceImpl implements ConsumerService {
@@ -21,21 +20,17 @@ public class ConsumerServiceImpl implements ConsumerService {
     }
 
     @Transactional
-    public Set<ConsumerDTO> findAll() {
-        Set<ConsumerDTO> result = new HashSet<>();
-        for(Consumer consumer: consumerRepository.findAll()){
-            HashMap<Long, String> groups = new HashMap<>();
-            consumer.getGroups().forEach(group -> groups.put(group.getId(), group.getName()));
+    public ConsumerDTO findById(Long consumerId) {
+        Optional<Consumer> optimal = consumerRepository.findById(consumerId);
+        if (!optimal.isPresent()) return null;
 
-            ConsumerDTO consumerDTO = ConsumerDTO.builder()
-                    .id(consumer.getId())
-                    .name(consumer.getName())
-                    .groups(groups)
-                    .build();
+        HashMap<Long, String> groups = new HashMap<>();
+        optimal.get().getGroups().forEach(group -> groups.put(group.getId(), group.getName()));
 
-            result.add(consumerDTO);
-        }
-
-        return result;
+        return ConsumerDTO.builder()
+                .id(optimal.get().getId())
+                .name(optimal.get().getName())
+                .groups(groups)
+                .build();
     }
 }

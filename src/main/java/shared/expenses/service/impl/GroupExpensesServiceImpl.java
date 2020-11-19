@@ -1,5 +1,6 @@
 package shared.expenses.service.impl;
 
+import shared.expenses.dto.ConsumerDTO;
 import shared.expenses.dto.ExpenseInfoDTO;
 import shared.expenses.dto.GroupExpensesInfoDTO;
 import shared.expenses.pojo.Consumer;
@@ -32,6 +33,7 @@ public class GroupExpensesServiceImpl implements GroupExpensesService {
         this.consumerRepository = consumerRepository;
     }
 
+    @Transactional
     public GroupExpensesInfoDTO listOrderByCreateTime(Long groupExpensesId) {
         Optional<GroupExpenses> groupExpense = groupExpenseRepository.findById(groupExpensesId);
         return groupExpense.map(this::getGroupInfoOrderByCreateTime).orElse(null);
@@ -65,6 +67,7 @@ public class GroupExpensesServiceImpl implements GroupExpensesService {
         return consumers;
     }
 
+    @Transactional
     public GroupExpensesInfoDTO addExpense(Long groupExpensesId, Expense expense) {
         Optional<GroupExpenses> groupExpense = groupExpenseRepository.findById(groupExpensesId);
         if (!groupExpense.isPresent())
@@ -74,6 +77,7 @@ public class GroupExpensesServiceImpl implements GroupExpensesService {
 
         return getGroupInfoOrderByCreateTime(groupExpense.get());
     }
+
 
     private GroupExpensesInfoDTO getGroupInfoOrderByCreateTime(GroupExpenses groupExpense) {
         LinkedHashMap<Long, ExpenseInfoDTO> expensesList = new LinkedHashMap<>();
@@ -105,11 +109,17 @@ public class GroupExpensesServiceImpl implements GroupExpensesService {
     }
 
     private void addExpenseToList(LinkedHashMap<Long, ExpenseInfoDTO> expensesList, Expense expense) {
+
+        ConsumerDTO consumerDTO = ConsumerDTO.builder()
+                .id(expense.getPayer().getId())
+                .name(expense.getPayer().getName())
+                .build();
+
         ExpenseInfoDTO expenseInfoDTO = ExpenseInfoDTO.builder()
                 .amount(expense.getAmount())
                 .description(expense.getDescription())
                 .createTime(expense.getCreateTime())
-                .payer(expense.getPayer())
+                .payer(consumerDTO)
                 .build();
         expensesList.put(expense.getId(), expenseInfoDTO);
     }

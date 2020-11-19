@@ -9,8 +9,6 @@ import shared.expenses.dto.ConsumerDTO;
 import shared.expenses.pojo.Consumer;
 import shared.expenses.service.ConsumerService;
 
-import java.util.Set;
-
 @Controller("/consumer")
 public class ConsumerController {
 
@@ -20,10 +18,10 @@ public class ConsumerController {
         this.consumerService = consumerService;
     }
 
-    @Get("/")
+    @Get("/{consumerId}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Set<ConsumerDTO> getConsumers() {
-        return consumerService.findAll();
+    public ConsumerDTO getConsumer(Long consumerId) {
+        return consumerService.findById(consumerId);
     }
 
     @Post("/")

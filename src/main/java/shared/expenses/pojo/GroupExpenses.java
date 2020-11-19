@@ -19,6 +19,5 @@ public class GroupExpenses {
     private String name;
 
     @ManyToMany(mappedBy = "groups", cascade = CascadeType.MERGE)
-    @JsonIgnore
     private Set<Consumer> consumers;
 }

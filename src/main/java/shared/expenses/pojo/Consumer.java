@@ -21,7 +21,6 @@ public class Consumer {
     @JoinTable(name = "consumer_group",
             joinColumns = {@JoinColumn(name = "consumer_id")},
             inverseJoinColumns = {@JoinColumn(name = "group_id")})
-    @JsonIgnore
     private Set<GroupExpenses> groups;
 }
 

@@ -1,12 +1,10 @@
 package shared.expenses.controller;
 
 import io.micronaut.http.HttpResponse;
-import io.micronaut.http.HttpStatus;
 import io.micronaut.http.MediaType;
 import io.micronaut.http.annotation.*;
 import shared.expenses.dto.GroupExpensesInfoDTO;
 import shared.expenses.pojo.Expense;
-import shared.expenses.pojo.GroupExpenses;
 import shared.expenses.service.GroupExpensesService;
 
 @Controller("/ge/{groupExpensesId}")
