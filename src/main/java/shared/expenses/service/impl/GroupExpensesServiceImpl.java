@@ -34,10 +34,20 @@ public class GroupExpensesServiceImpl implements GroupExpensesService {
     }
 
     @Transactional
-    public GroupExpensesInfoDTO listOrderByCreateTime(Long groupExpensesId) {
-        Optional<GroupExpenses> groupExpense = groupExpenseRepository.findById(groupExpensesId);
-        return groupExpense.map(this::getGroupInfoOrderByCreateTime).orElse(null);
+    public GroupExpensesInfoDTO getGroupExpenseInfo(Long groupExpensesId) {
+        Optional<GroupExpenses> optional = groupExpenseRepository.findById(groupExpensesId);
+        if (!optional.isPresent())
+            return null;
 
+        List<Expense> expenseList = expenseRepository.findAllByGroupExpensesOrderByCreateTimeDesc(optional.get().getId());
+        if(expenseList.isEmpty())
+            return GroupExpensesInfoDTO.builder()
+                    .groupId(optional.get().getId())
+                    .groupName(optional.get().getName())
+                    .consumers(getConsumersGroup(optional.get()))
+                    .build();
+
+        return getGroupExpenseInfoWithExpenses(optional.get(), expenseList);
     }
 
     @Transactional
@@ -61,33 +71,39 @@ public class GroupExpensesServiceImpl implements GroupExpensesService {
     }
 
     private HashMap<Long, String> getConsumersGroup(GroupExpenses groupExpenses, Consumer consumer) {
+        HashMap<Long, String> consumers = getConsumersGroup(groupExpenses);
+        consumers.put(consumer.getId(), consumer.getName());
+        return consumers;
+    }
+
+    private HashMap<Long, String> getConsumersGroup(GroupExpenses groupExpenses){
         HashMap<Long, String> consumers = new HashMap<>();
         groupExpenses.getConsumers().forEach(c -> consumers.put(c.getId(), c.getName()));
-        consumers.put(consumer.getId(), consumer.getName());
         return consumers;
     }
 
     @Transactional
     public GroupExpensesInfoDTO addExpense(Long groupExpensesId, Expense expense) {
-        Optional<GroupExpenses> groupExpense = groupExpenseRepository.findById(groupExpensesId);
-        if (!groupExpense.isPresent())
+        Optional<GroupExpenses> optional = groupExpenseRepository.findById(groupExpensesId);
+        if (!optional.isPresent())
             return null;
 
         expenseRepository.save(expense);
 
-        return getGroupInfoOrderByCreateTime(groupExpense.get());
+        List<Expense> expenseList = expenseRepository.findAllByGroupExpensesOrderByCreateTimeDesc(optional.get().getId());
+        return getGroupExpenseInfoWithExpenses(optional.get(), expenseList);
     }
 
 
-    private GroupExpensesInfoDTO getGroupInfoOrderByCreateTime(GroupExpenses groupExpense) {
-        LinkedHashMap<Long, ExpenseInfoDTO> expensesList = new LinkedHashMap<>();
+    private GroupExpensesInfoDTO getGroupExpenseInfoWithExpenses(GroupExpenses groupExpense, List<Expense> expenseList) {
+        LinkedHashMap<Long, ExpenseInfoDTO> expensesInfoDTOList = new LinkedHashMap<>();
         HashMap<String, Float> balance = new HashMap<>();
         float totalExpenses = 0;
 
-        for (Expense expense : expenseRepository.findAllOrderByCreateTimeDesc(groupExpense)) {
+        for (Expense expense : expenseList) {
             totalExpenses += expense.getAmount();
             addExpenseToBalance(balance, expense);
-            addExpenseToList(expensesList, expense);
+            addExpenseToList(expensesInfoDTOList, expense);
         }
 
         getBalance(balance, totalExpenses);
@@ -97,7 +113,7 @@ public class GroupExpensesServiceImpl implements GroupExpensesService {
         return GroupExpensesInfoDTO.builder()
                 .groupId(groupExpense.getId())
                 .groupName(groupExpense.getName())
-                .expensesList(expensesList)
+                .expensesList(expensesInfoDTOList)
                 .balance(balance)
                 .debts(debts)
                 .build();
@@ -108,7 +124,7 @@ public class GroupExpensesServiceImpl implements GroupExpensesService {
         balance.forEach((k, v) -> balance.replace(k, Utils.round(balance.get(k) - mean, 2)));
     }
 
-    private void addExpenseToList(LinkedHashMap<Long, ExpenseInfoDTO> expensesList, Expense expense) {
+    private void addExpenseToList(LinkedHashMap<Long, ExpenseInfoDTO> expensesInfoDTOList, Expense expense) {
 
         ConsumerDTO consumerDTO = ConsumerDTO.builder()
                 .id(expense.getPayer().getId())
@@ -121,7 +137,8 @@ public class GroupExpensesServiceImpl implements GroupExpensesService {
                 .createTime(expense.getCreateTime())
                 .payer(consumerDTO)
                 .build();
-        expensesList.put(expense.getId(), expenseInfoDTO);
+
+        expensesInfoDTOList.put(expense.getId(), expenseInfoDTO);
     }
 
     private void addExpenseToBalance(HashMap<String, Float> balance, Expense expense) {

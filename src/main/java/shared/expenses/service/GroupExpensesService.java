@@ -4,7 +4,7 @@ import shared.expenses.dto.GroupExpensesInfoDTO;
 import shared.expenses.pojo.Expense;
 
 public interface GroupExpensesService {
-    GroupExpensesInfoDTO listOrderByCreateTime(Long groupExpensesId);
+    GroupExpensesInfoDTO getGroupExpenseInfo(Long groupExpensesId);
 
     GroupExpensesInfoDTO addConsumerToGroup(Long groupExpensesId, Long consumerId);
 

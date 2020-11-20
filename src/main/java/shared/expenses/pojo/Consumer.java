@@ -1,6 +1,6 @@
 package shared.expenses.pojo;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -10,6 +10,7 @@ import java.util.Set;
 @Getter
 @Setter
 @Entity
+@AllArgsConstructor(staticName = "of")
 public class Consumer {
 
     @Id
@@ -22,5 +23,13 @@ public class Consumer {
             joinColumns = {@JoinColumn(name = "consumer_id")},
             inverseJoinColumns = {@JoinColumn(name = "group_id")})
     private Set<GroupExpenses> groups;
+
+    public Consumer(Long id, String name) {
+        this.id = id;
+        this.name = name;
+    }
+
+    public Consumer() {
+    }
 }
 

@@ -19,7 +19,7 @@ public class GroupExpensesController {
     @Get("/expenses")
     @Produces(MediaType.APPLICATION_JSON)
     public GroupExpensesInfoDTO getExpenses(Long groupExpensesId) {
-        return groupExpensesService.listOrderByCreateTime(groupExpensesId);
+        return groupExpensesService.getGroupExpenseInfo(groupExpensesId);
     }
 
     @Post("/expenses")

@@ -1,6 +1,7 @@
 package shared.expenses.pojo;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -10,6 +11,8 @@ import java.util.Set;
 
 @Getter
 @Setter
+@Builder
+@AllArgsConstructor(staticName = "of")
 @Entity
 public class GroupExpenses {
 
@@ -20,4 +23,7 @@ public class GroupExpenses {
 
     @ManyToMany(mappedBy = "groups", cascade = CascadeType.MERGE)
     private Set<Consumer> consumers;
+
+    public GroupExpenses() {
+    }
 }
