@@ -32,7 +32,7 @@ public class GroupExpensesServiceImpTest {
     }
 
     @AfterEach
-    void resetMock(){
+    void resetMock() {
         reset(groupExpenseRepository);
         reset(expenseRepository);
         reset(consumerRepository);
@@ -63,6 +63,61 @@ public class GroupExpensesServiceImpTest {
         Assertions.assertEquals(expected, result);
     }
 
+    @Test
+    void shouldReturnGroupExpensesInfoWithANewConsumer() {
+        GroupExpensesInfoDTO expected = createGroupExpensesInfo(false);
+        Consumer newConsumer = Consumer.of(8L, "Juan Lopez", new HashSet<>());
+        expected.getConsumers().put(newConsumer.getId(), newConsumer.getName());
+
+        when(groupExpenseRepository.findById(3L))
+                .thenReturn(Optional.of(this.createGroupExpenses()));
+        when(consumerRepository.findById(8L))
+                .thenReturn(Optional.of(newConsumer));
+
+        GroupExpensesInfoDTO result = groupExpensesService.addConsumerToGroup(3L, 8L);
+
+        Assertions.assertEquals(expected, result);
+
+    }
+
+    @Test
+    void shouldReturnNullBecauseConsumerNotExist() {
+        when(groupExpenseRepository.findById(3L))
+                .thenReturn(Optional.of(this.createGroupExpenses()));
+        when(consumerRepository.findById(8L))
+                .thenReturn(Optional.empty());
+
+        GroupExpensesInfoDTO result = groupExpensesService.addConsumerToGroup(3L, 8L);
+
+        Assertions.assertNull(result);
+    }
+
+    @Test
+    void shouldReturnNullBecauseGroupExpenseNotExist() {
+        when(groupExpenseRepository.findById(3L))
+                .thenReturn(Optional.empty());
+
+        GroupExpensesInfoDTO result = groupExpensesService.getGroupExpenseInfo(3L);
+
+        Assertions.assertNull(result);
+
+    }
+
+    @Test
+    void shouldReturnGroupExpensesInfoWithANewExpense() {
+        GroupExpensesInfoDTO expected = createGroupExpensesInfo(true);
+
+        when(groupExpenseRepository.findById(3L))
+                .thenReturn(Optional.of(this.createGroupExpenses()));
+
+        when(expenseRepository.findAllByGroupExpensesOrderByCreateTimeDesc(3L))
+                .thenReturn(createExpensesList());
+
+        GroupExpensesInfoDTO result = groupExpensesService.addExpense(3L, Expense.builder().build());
+
+        Assertions.assertEquals(expected, result);
+    }
+
     private GroupExpensesInfoDTO createGroupExpensesInfo(boolean hasExpenses) {
         if (hasExpenses) {
             LinkedHashMap<Long, ExpenseInfoDTO> expensesInfoDTOList = new LinkedHashMap<>();
@@ -75,7 +130,7 @@ public class GroupExpensesServiceImpTest {
             expensesInfoDTOList.put(13L, ExpenseInfoDTO.builder()
                     .amount(1f)
                     .description("dd")
-                    .createTime(new Date(1602922874000L))
+                    .createTime(new Date(1602922874000L)) //Timespamp
                     .payer(ConsumerDTO.builder().id(6L).name("Raúl González").build())
                     .build());
 
@@ -123,6 +178,7 @@ public class GroupExpensesServiceImpTest {
                 .description("dd")
                 .createTime(new Date(1602922874000L))
                 .payer(new Consumer(1L, "Alfonso Pérez"))
+                .groupExpenses(createGroupExpenses())
                 .build());
         expenseList.add(Expense.builder()
                 .id(13)
@@ -130,6 +186,7 @@ public class GroupExpensesServiceImpTest {
                 .description("dd")
                 .createTime(new Date(1602922874000L))
                 .payer(new Consumer(6L, "Raúl González"))
+                .groupExpenses(createGroupExpenses())
                 .build());
 
         return expenseList;

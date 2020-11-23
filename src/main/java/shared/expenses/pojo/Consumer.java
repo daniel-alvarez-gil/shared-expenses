@@ -1,6 +1,7 @@
 package shared.expenses.pojo;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -10,6 +11,7 @@ import java.util.Set;
 @Getter
 @Setter
 @Entity
+@Builder
 @AllArgsConstructor(staticName = "of")
 public class Consumer {
 

@@ -1,5 +1,6 @@
 package shared.expenses.pojo;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
@@ -9,6 +10,7 @@ import java.util.Date;
 @Data
 @Entity
 @Builder
+@AllArgsConstructor(staticName = "of")
 public class Expense {
 
     @Id
@@ -26,4 +28,7 @@ public class Expense {
     @ManyToOne
     @JoinColumn(name = "group_expense_id")
     private GroupExpenses groupExpenses;
+
+    public Expense() {
+    }
 }
