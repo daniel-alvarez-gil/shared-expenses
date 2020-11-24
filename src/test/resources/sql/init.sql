@@ -41,30 +41,27 @@ INSERT INTO `consumer` VALUES (1,'Alfonso Pérez'),(3,'José María Gutiérrez')
 UNLOCK TABLES;
 
 --
--- Table structure for table `consumer_group`
+-- Table structure for table `group_expenses`
 --
 
-DROP TABLE IF EXISTS `consumer_group`;
+DROP TABLE IF EXISTS `group_expenses`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `consumer_group` (
-  `consumer_id` bigint NOT NULL,
-  `group_id` bigint NOT NULL,
-  PRIMARY KEY (`consumer_id`,`group_id`),
-  KEY `FK7vs83g9fcsxdtt2mno6jdh9na` (`group_id`),
-  CONSTRAINT `FK7vs83g9fcsxdtt2mno6jdh9na` FOREIGN KEY (`group_id`) REFERENCES `group_expenses` (`id`),
-  CONSTRAINT `FKmfwm1jlf3q2jh7uy556fvpgna` FOREIGN KEY (`consumer_id`) REFERENCES `consumer` (`id`)
+CREATE TABLE `group_expenses` (
+  `id` bigint NOT NULL,
+  `name` varchar(255) COLLATE utf8_bin DEFAULT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `consumer_group`
+-- Dumping data for table `group_expenses`
 --
 
-LOCK TABLES `consumer_group` WRITE;
-/*!40000 ALTER TABLE `consumer_group` DISABLE KEYS */;
-INSERT INTO `consumer_group` VALUES (1,2),(3,2),(4,2),(1,3),(6,3);
-/*!40000 ALTER TABLE `consumer_group` ENABLE KEYS */;
+LOCK TABLES `group_expenses` WRITE;
+/*!40000 ALTER TABLE `group_expenses` DISABLE KEYS */;
+INSERT INTO `group_expenses` VALUES (2,'Grupo'),(3,'Grupo 2');
+/*!40000 ALTER TABLE `group_expenses` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -100,27 +97,30 @@ INSERT INTO `expense` VALUES (0,1,'1970-01-19 14:00:28.800000','Primer registro'
 UNLOCK TABLES;
 
 --
--- Table structure for table `group_expenses`
+-- Table structure for table `consumer_group`
 --
 
-DROP TABLE IF EXISTS `group_expenses`;
+DROP TABLE IF EXISTS `consumer_group`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `group_expenses` (
-  `id` bigint NOT NULL,
-  `name` varchar(255) COLLATE utf8_bin DEFAULT NULL,
-  PRIMARY KEY (`id`)
+CREATE TABLE `consumer_group` (
+  `consumer_id` bigint NOT NULL,
+  `group_id` bigint NOT NULL,
+  PRIMARY KEY (`consumer_id`,`group_id`),
+  KEY `FK7vs83g9fcsxdtt2mno6jdh9na` (`group_id`),
+  CONSTRAINT `FK7vs83g9fcsxdtt2mno6jdh9na` FOREIGN KEY (`group_id`) REFERENCES `group_expenses` (`id`),
+  CONSTRAINT `FKmfwm1jlf3q2jh7uy556fvpgna` FOREIGN KEY (`consumer_id`) REFERENCES `consumer` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `group_expenses`
+-- Dumping data for table `consumer_group`
 --
 
-LOCK TABLES `group_expenses` WRITE;
-/*!40000 ALTER TABLE `group_expenses` DISABLE KEYS */;
-INSERT INTO `group_expenses` VALUES (2,'Grupo'),(3,'Grupo 2');
-/*!40000 ALTER TABLE `group_expenses` ENABLE KEYS */;
+LOCK TABLES `consumer_group` WRITE;
+/*!40000 ALTER TABLE `consumer_group` DISABLE KEYS */;
+INSERT INTO `consumer_group` VALUES (1,2),(3,2),(4,2),(1,3),(6,3);
+/*!40000 ALTER TABLE `consumer_group` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --

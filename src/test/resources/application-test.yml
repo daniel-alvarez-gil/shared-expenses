@@ -1,0 +1,18 @@
+micronaut:
+  application:
+    name: sharedExpenses
+datasources:
+  default:
+    driverClassName: org.testcontainers.jdbc.ContainerDatabaseDriver
+    url: jdbc:tc:mysql:latest://localhost:3306/dev?TC_INITSCRIPT=sql/init.sql
+    username: root
+    password: password
+jpa:
+  default:
+    entity-scan:
+      packages: 'shared.expenses'
+    properties:
+      hibernate:
+        hbm2ddl:
+          auto: update
+        show_sql: true

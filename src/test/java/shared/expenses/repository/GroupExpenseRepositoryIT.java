@@ -21,14 +21,6 @@ public class GroupExpenseRepositoryIT {
     @Inject
     ConsumerRepository consumerRepository;
 
-    @ClassRule
-    static MysqlContainer mysqlContainer;
-
-    @BeforeAll
-    static void init() {
-        mysqlContainer = MysqlContainer.getInstance();
-    }
-
     @Test
     void shouldReturnGroupExpense() {
         GroupExpenses expected = createGroupExpenses();
