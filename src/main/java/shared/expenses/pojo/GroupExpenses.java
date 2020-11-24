@@ -3,10 +3,12 @@ package shared.expenses.pojo;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.Objects;
 import java.util.Set;
 
 
-@Data
+@Getter
+@Setter
 @Builder
 @AllArgsConstructor(staticName = "of")
 @Entity
@@ -21,5 +23,15 @@ public class GroupExpenses {
     private Set<Consumer> consumers;
 
     public GroupExpenses() {
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        GroupExpenses that = (GroupExpenses) o;
+        return Objects.equals(id, that.id) &&
+                Objects.equals(name, that.name) &&
+                Objects.equals(consumers, that.consumers);
     }
 }

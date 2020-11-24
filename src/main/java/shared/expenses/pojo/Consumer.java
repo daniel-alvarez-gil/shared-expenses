@@ -9,6 +9,7 @@ import java.util.Set;
 @Getter
 @Setter
 @Entity
+@ToString
 @Builder
 @AllArgsConstructor(staticName = "of")
 public class Consumer {
@@ -40,11 +41,6 @@ public class Consumer {
         return Objects.equals(id, consumer.id) &&
                 Objects.equals(name, consumer.name) &&
                 Objects.equals(groups, consumer.groups);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, groups);
     }
 }
 
