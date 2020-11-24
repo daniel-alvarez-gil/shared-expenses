@@ -88,6 +88,7 @@ public class GroupExpensesServiceImpl implements GroupExpensesService {
         if (!optional.isPresent())
             return null;
 
+        expense.setCreateTime(new Date());
         expenseRepository.save(expense);
 
         List<Expense> expenseList = expenseRepository.findAllByGroupExpensesOrderByCreateTimeDesc(optional.get().getId());

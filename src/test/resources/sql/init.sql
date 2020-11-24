@@ -60,7 +60,7 @@ CREATE TABLE `group_expenses` (
 
 LOCK TABLES `group_expenses` WRITE;
 /*!40000 ALTER TABLE `group_expenses` DISABLE KEYS */;
-INSERT INTO `group_expenses` VALUES (2,'Grupo'),(3,'Grupo 2');
+INSERT INTO `group_expenses` VALUES (2,'Grupo'),(3,'Grupo 2'),(4,'Grupo 3');
 /*!40000 ALTER TABLE `group_expenses` ENABLE KEYS */;
 UNLOCK TABLES;
 

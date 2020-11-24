@@ -1,11 +1,9 @@
 package shared.expenses.pojo;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
+import java.util.Objects;
 import java.util.Set;
 
 @Getter
@@ -32,6 +30,21 @@ public class Consumer {
     }
 
     public Consumer() {
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Consumer consumer = (Consumer) o;
+        return Objects.equals(id, consumer.id) &&
+                Objects.equals(name, consumer.name) &&
+                Objects.equals(groups, consumer.groups);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, groups);
     }
 }
 
