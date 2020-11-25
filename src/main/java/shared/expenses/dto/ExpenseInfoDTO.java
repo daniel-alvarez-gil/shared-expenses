@@ -9,6 +9,7 @@ import java.util.Date;
 @Builder
 public class ExpenseInfoDTO {
 
+    private Long id;
     private Float amount;
     private String description;
     private Date createTime;

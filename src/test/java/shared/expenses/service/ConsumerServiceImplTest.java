@@ -12,7 +12,6 @@ import shared.expenses.service.impl.ConsumerServiceImpl;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Optional;
 
 import static org.mockito.Mockito.*;
@@ -56,7 +55,7 @@ public class ConsumerServiceImplTest {
 
     }
 
-    private ConsumerDTO createConsumerDTO(){
+    private ConsumerDTO createConsumerDTO() {
         HashMap<Long, String> groups = new HashMap<>();
         groups.put(1L, "Grupo 1");
         groups.put(2L, "Grupo 2");

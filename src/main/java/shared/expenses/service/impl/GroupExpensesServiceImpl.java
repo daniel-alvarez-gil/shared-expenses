@@ -39,7 +39,7 @@ public class GroupExpensesServiceImpl implements GroupExpensesService {
         if (!optional.isPresent())
             return null;
 
-        List<Expense> expenseList = expenseRepository.findAllByGroupExpensesOrderByCreateTimeDesc(optional.get().getId());
+        LinkedList<Expense> expenseList = expenseRepository.findAllByGroupExpensesOrderByCreateTimeDesc(optional.get().getId());
         if(expenseList.isEmpty())
             return GroupExpensesInfoDTO.builder()
                     .groupId(optional.get().getId())
@@ -70,15 +70,17 @@ public class GroupExpensesServiceImpl implements GroupExpensesService {
                 .build();
     }
 
-    private HashMap<Long, String> getConsumersGroup(GroupExpenses groupExpenses, Consumer consumer) {
-        HashMap<Long, String> consumers = getConsumersGroup(groupExpenses);
-        consumers.put(consumer.getId(), consumer.getName());
+    private LinkedList<ConsumerDTO> getConsumersGroup(GroupExpenses groupExpenses, Consumer consumer) {
+        LinkedList<ConsumerDTO> consumers = getConsumersGroup(groupExpenses);
+        consumers.add(ConsumerDTO.builder().id(consumer.getId()).name(consumer.getName()).build());
         return consumers;
     }
 
-    private HashMap<Long, String> getConsumersGroup(GroupExpenses groupExpenses){
-        HashMap<Long, String> consumers = new HashMap<>();
-        groupExpenses.getConsumers().forEach(c -> consumers.put(c.getId(), c.getName()));
+    private LinkedList<ConsumerDTO> getConsumersGroup(GroupExpenses groupExpenses){
+        LinkedList<ConsumerDTO> consumers = new LinkedList<>();
+        groupExpenses.getConsumers().forEach(c ->
+                consumers.add(ConsumerDTO.builder().id(c.getId()).name(c.getName()).build())
+        );
         return consumers;
     }
 
@@ -97,7 +99,7 @@ public class GroupExpensesServiceImpl implements GroupExpensesService {
 
 
     private GroupExpensesInfoDTO getGroupExpenseInfoWithExpenses(GroupExpenses groupExpense, List<Expense> expenseList) {
-        LinkedHashMap<Long, ExpenseInfoDTO> expensesInfoDTOList = new LinkedHashMap<>();
+        List<ExpenseInfoDTO> expensesInfoDTOList = new LinkedList<>();
         HashMap<String, Float> balance = new HashMap<>();
         float totalExpenses = 0;
 
@@ -125,7 +127,7 @@ public class GroupExpensesServiceImpl implements GroupExpensesService {
         balance.forEach((k, v) -> balance.replace(k, Utils.round(balance.get(k) - mean, 2)));
     }
 
-    private void addExpenseToList(LinkedHashMap<Long, ExpenseInfoDTO> expensesInfoDTOList, Expense expense) {
+    private void addExpenseToList(List<ExpenseInfoDTO> expensesInfoDTOList, Expense expense) {
 
         ConsumerDTO consumerDTO = ConsumerDTO.builder()
                 .id(expense.getPayer().getId())
@@ -133,13 +135,14 @@ public class GroupExpensesServiceImpl implements GroupExpensesService {
                 .build();
 
         ExpenseInfoDTO expenseInfoDTO = ExpenseInfoDTO.builder()
+                .id(expense.getId())
                 .amount(expense.getAmount())
                 .description(expense.getDescription())
                 .createTime(expense.getCreateTime())
                 .payer(consumerDTO)
                 .build();
 
-        expensesInfoDTOList.put(expense.getId(), expenseInfoDTO);
+        expensesInfoDTOList.add(expenseInfoDTO);
     }
 
     private void addExpenseToBalance(HashMap<String, Float> balance, Expense expense) {
@@ -161,11 +164,11 @@ public class GroupExpensesServiceImpl implements GroupExpensesService {
             balance.remove(Max_Key);
             balance.remove(Min_Key);
             if (result >= ZERO) {
-                debts.add(Min_Key + " -> " + Max_Key + ": " + Utils.round(Math.abs(Min_Value), 2));
+                debts.add(String.format("%s -> %s (%.2f)", Min_Key, Max_Key, Utils.round(Math.abs(Min_Value), 2)));
                 balance.put(Max_Key, result);
                 balance.put(Min_Key, ZERO);
             } else {
-                debts.add(Min_Key + " -> " + Max_Key + ": " + Utils.round(Math.abs(Max_Value), 2));
+                debts.add(String.format("%s -> %s (%.2f)", Min_Key, Max_Key, Utils.round(Math.abs(Max_Value), 2)));
                 balance.put(Max_Key, ZERO);
                 balance.put(Min_Key, result);
             }

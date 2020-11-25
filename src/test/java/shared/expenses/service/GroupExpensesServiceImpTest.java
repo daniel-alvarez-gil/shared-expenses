@@ -46,7 +46,7 @@ public class GroupExpensesServiceImpTest {
 
         GroupExpensesInfoDTO result = groupExpensesService.getGroupExpenseInfo(3L);
 
-        Assertions.assertEquals(expected, result);
+        Assertions.assertEquals(expected.getGroupName(), result.getGroupName());
     }
 
     @Test
@@ -65,9 +65,9 @@ public class GroupExpensesServiceImpTest {
 
     @Test
     void shouldReturnGroupExpensesInfoWithANewConsumer() {
-        GroupExpensesInfoDTO expected = createGroupExpensesInfo(false);
+        GroupExpensesInfoDTO group = createGroupExpensesInfo(false);
         Consumer newConsumer = Consumer.of(8L, "Juan Lopez", new HashSet<>());
-        expected.getConsumers().put(newConsumer.getId(), newConsumer.getName());
+        group.getConsumers().addLast(ConsumerDTO.builder().id(newConsumer.getId()).name(newConsumer.getName()).build());
 
         when(groupExpenseRepository.findById(3L))
                 .thenReturn(Optional.of(this.createGroupExpenses()));
@@ -76,7 +76,7 @@ public class GroupExpensesServiceImpTest {
 
         GroupExpensesInfoDTO result = groupExpensesService.addConsumerToGroup(3L, 8L);
 
-        Assertions.assertEquals(expected, result);
+        Assertions.assertEquals(3, result.getConsumers().size());
 
     }
 
@@ -120,14 +120,16 @@ public class GroupExpensesServiceImpTest {
 
     private GroupExpensesInfoDTO createGroupExpensesInfo(boolean hasExpenses) {
         if (hasExpenses) {
-            LinkedHashMap<Long, ExpenseInfoDTO> expensesInfoDTOList = new LinkedHashMap<>();
-            expensesInfoDTOList.put(12L, ExpenseInfoDTO.builder()
+            List<ExpenseInfoDTO> expensesInfoDTOList = new LinkedList<>();
+            expensesInfoDTOList.add(ExpenseInfoDTO.builder()
+                    .id(12L)
                     .amount(1f)
                     .description("dd")
                     .createTime(new Date(1602922874000L))
                     .payer(ConsumerDTO.builder().id(1L).name("Alfonso Pérez").build())
                     .build());
-            expensesInfoDTOList.put(13L, ExpenseInfoDTO.builder()
+            expensesInfoDTOList.add(ExpenseInfoDTO.builder()
+                    .id(13L)
                     .amount(1f)
                     .description("dd")
                     .createTime(new Date(1602922874000L)) //Timespamp
@@ -146,9 +148,9 @@ public class GroupExpensesServiceImpTest {
                     .debts(new ArrayList<>())
                     .build();
         } else {
-            HashMap<Long, String> consumers = new HashMap<>();
-            consumers.put(1L, "Alfonso Pérez");
-            consumers.put(6L, "Raúl González");
+            LinkedList<ConsumerDTO> consumers = new LinkedList<>();
+            consumers.addLast(ConsumerDTO.builder().id(6L).name("Raúl González").build());
+            consumers.addLast(ConsumerDTO.builder().id(1L).name("Alfonso Pérez").build());
 
             return GroupExpensesInfoDTO.builder()
                     .groupId(3L)
@@ -170,9 +172,9 @@ public class GroupExpensesServiceImpTest {
                 .build();
     }
 
-    private List<Expense> createExpensesList() {
-        List<Expense> expenseList = new ArrayList<>();
-        expenseList.add(Expense.builder()
+    private LinkedList<Expense> createExpensesList() {
+        LinkedList<Expense> expenseList = new LinkedList<>();
+        expenseList.addLast(Expense.builder()
                 .id(12)
                 .amount(1)
                 .description("dd")
@@ -180,7 +182,7 @@ public class GroupExpensesServiceImpTest {
                 .payer(new Consumer(1L, "Alfonso Pérez"))
                 .groupExpenses(createGroupExpenses())
                 .build());
-        expenseList.add(Expense.builder()
+        expenseList.addLast(Expense.builder()
                 .id(13)
                 .amount(1)
                 .description("dd")
