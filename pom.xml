@@ -13,13 +13,20 @@
     </parent>
 
     <properties>
-        <jacoco.it.execution.data.file>${project.build.directory}/coverage-reports/jacoco-it.exec</jacoco.it.execution.data.file>
-        <jacoco.ut.execution.data.file>${project.build.directory}/coverage-reports/jacoco-ut.exec</jacoco.ut.execution.data.file>
         <jdk.version>11</jdk.version>
         <!-- If you are building with JDK 9 or higher, you can uncomment the lines below to set the release version -->
         <!-- <release.version>8</release.version> -->
         <micronaut.version>2.1.3</micronaut.version>
         <exec.mainClass>shared.expenses.Application</exec.mainClass>
+
+        <jacoco.version>0.8.6</jacoco.version>
+        <jacoco.outputDir>${project.build.directory}</jacoco.outputDir>
+
+        <jacoco.utreportpath>${project.build.directory}/jacoco</jacoco.utreportpath>
+        <jacoco.utreportfile>${jacoco.utreportpath}/jacoco.exec</jacoco.utreportfile>
+
+        <jacoco.itreportpath>${project.build.directory}/jacoco</jacoco.itreportpath>
+        <jacoco.itreportfile>${jacoco.itreportpath}/jacoco-it.exec</jacoco.itreportfile>
 
     </properties>
 
@@ -132,23 +139,6 @@
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-failsafe-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>integration-tests</id>
-                        <goals>
-                            <goal>integration-test</goal>
-                            <goal>verify</goal>
-                        </goals>
-                        <configuration>
-                            <argLine>${failsafeArgLine}</argLine>
-                            <skipTests>${skip.integration.tests}</skipTests>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
                     <!-- Uncomment to enable incremental compilation -->
@@ -206,16 +196,18 @@
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.8.6</version>
+                <version>${jacoco.version}</version>
                 <executions>
                     <execution>
                         <id>pre-unit-test</id>
+                        <phase>process-test-classes</phase>
                         <goals>
                             <goal>prepare-agent</goal>
                         </goals>
                         <configuration>
-                            <destFile>${jacoco.ut.execution.data.file}</destFile>
                             <propertyName>surefireArgLine</propertyName>
+                            <destFile>${jacoco.utreportfile}</destFile>
+                            <append>true</append>
                         </configuration>
                     </execution>
                     <execution>
@@ -225,19 +217,20 @@
                             <goal>report</goal>
                         </goals>
                         <configuration>
-                            <dataFile>${jacoco.ut.execution.data.file}</dataFile>
-                            <outputDirectory>${project.reporting.outputDirectory}/jacoco-ut</outputDirectory>
+                            <outputDirectory>${jacoco.utreportpath}</outputDirectory>
+                            <dataFile>${jacoco.utreportfile}</dataFile>
                         </configuration>
                     </execution>
                     <execution>
                         <id>pre-integration-test</id>
                         <phase>pre-integration-test</phase>
                         <goals>
-                            <goal>prepare-agent</goal>
+                            <goal>prepare-agent-integration</goal>
                         </goals>
                         <configuration>
-                            <destFile>${jacoco.it.execution.data.file}</destFile>
                             <propertyName>failsafeArgLine</propertyName>
+                            <destFile>${jacoco.itreportfile}</destFile>
+                            <append>true</append>
                         </configuration>
                     </execution>
                     <execution>
@@ -247,48 +240,43 @@
                             <goal>report</goal>
                         </goals>
                         <configuration>
-                            <dataFile>${jacoco.it.execution.data.file}</dataFile>
-                            <outputDirectory>${project.reporting.outputDirectory}/jacoco-it</outputDirectory>
+                            <outputDirectory>${jacoco.itreportpath}</outputDirectory>
+                            <dataFile>${jacoco.itreportfile}</dataFile>
                         </configuration>
                     </execution>
                 </executions>
             </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <argLine>${surefireArgLine}</argLine>
-                    <skipTests>${skip.unit.tests}</skipTests>
+                    <excludes>
+                        <exclude>**/*IT.java</exclude>
+                    </excludes>
                 </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>unit-tests</id>
-                        <phase>test</phase>
-                        <goals>
-                            <goal>test</goal>
-                        </goals>
-                        <configuration>
-                            <skipTests>false</skipTests>
-                            <includes>
-                                <include>**/*Test.java</include>
-                            </includes>
-                        </configuration>
-                    </execution>
-                    <execution>
                         <id>integration-tests</id>
-                        <phase>integration-test</phase>
                         <goals>
-                            <goal>test</goal>
+                            <goal>integration-test</goal>
+                            <goal>verify</goal>
                         </goals>
                         <configuration>
+                            <argLine>${failsafeArgLine}</argLine>
+                            <reportsDirectory>${project.build.directory}/failsafe-reports</reportsDirectory>
                             <skipTests>false</skipTests>
-                            <includes>
-                                <include>**/*IT.java</include>
-                            </includes>
                         </configuration>
                     </execution>
                 </executions>
             </plugin>
+
         </plugins>
     </build>
 
