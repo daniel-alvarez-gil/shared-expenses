@@ -19,7 +19,7 @@ public class Consumer {
     private Long id;
     private String name;
 
-    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @ManyToMany(cascade = CascadeType.MERGE)
     @JoinTable(name = "consumer_group",
             joinColumns = {@JoinColumn(name = "consumer_id")},
             inverseJoinColumns = {@JoinColumn(name = "group_id")})

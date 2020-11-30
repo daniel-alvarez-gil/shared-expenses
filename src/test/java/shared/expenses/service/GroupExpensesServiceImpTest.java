@@ -1,6 +1,5 @@
 package shared.expenses.service;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,25 +16,20 @@ import shared.expenses.service.impl.GroupExpensesServiceImpl;
 
 import java.util.*;
 
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class GroupExpensesServiceImpTest {
 
-    static GroupExpensesService groupExpensesService;
-    static GroupExpenseRepository groupExpenseRepository = mock(GroupExpenseRepository.class);
-    static ExpenseRepository expenseRepository = mock(ExpenseRepository.class);
-    static ConsumerRepository consumerRepository = mock(ConsumerRepository.class);
+    GroupExpensesService groupExpensesService;
+    GroupExpenseRepository groupExpenseRepository = mock(GroupExpenseRepository.class);
+    ExpenseRepository expenseRepository = mock(ExpenseRepository.class);
+    ConsumerRepository consumerRepository = mock(ConsumerRepository.class);
 
     @BeforeEach
     void init() {
         groupExpensesService = new GroupExpensesServiceImpl(expenseRepository, groupExpenseRepository, consumerRepository);
-    }
-
-    @AfterEach
-    void resetMock() {
-        reset(groupExpenseRepository);
-        reset(expenseRepository);
-        reset(consumerRepository);
     }
 
     @Test
@@ -46,7 +40,7 @@ public class GroupExpensesServiceImpTest {
 
         GroupExpensesInfoDTO result = groupExpensesService.getGroupExpenseInfo(3L);
 
-        Assertions.assertEquals(expected.getGroupName(), result.getGroupName());
+        assertEquals(expected.getGroupName(), result.getGroupName());
     }
 
     @Test
@@ -60,7 +54,7 @@ public class GroupExpensesServiceImpTest {
 
         GroupExpensesInfoDTO result = groupExpensesService.getGroupExpenseInfo(3L);
 
-        Assertions.assertEquals(expected, result);
+        assertEquals(expected.getExpensesList(), result.getExpensesList());
     }
 
     @Test
@@ -71,25 +65,13 @@ public class GroupExpensesServiceImpTest {
 
         when(groupExpenseRepository.findById(3L))
                 .thenReturn(Optional.of(this.createGroupExpenses()));
-        when(consumerRepository.findById(8L))
-                .thenReturn(Optional.of(newConsumer));
+        when(consumerRepository.save(newConsumer))
+                .thenReturn(newConsumer);
 
-        GroupExpensesInfoDTO result = groupExpensesService.addConsumerToGroup(3L, 8L);
+        GroupExpensesInfoDTO result = groupExpensesService.addConsumerToGroup(3L, newConsumer.getName());
 
-        Assertions.assertEquals(3, result.getConsumers().size());
+        assertEquals(3, result.getConsumers().size());
 
-    }
-
-    @Test
-    void shouldReturnNullBecauseConsumerNotExist() {
-        when(groupExpenseRepository.findById(3L))
-                .thenReturn(Optional.of(this.createGroupExpenses()));
-        when(consumerRepository.findById(8L))
-                .thenReturn(Optional.empty());
-
-        GroupExpensesInfoDTO result = groupExpensesService.addConsumerToGroup(3L, 8L);
-
-        Assertions.assertNull(result);
     }
 
     @Test
@@ -99,7 +81,7 @@ public class GroupExpensesServiceImpTest {
 
         GroupExpensesInfoDTO result = groupExpensesService.getGroupExpenseInfo(3L);
 
-        Assertions.assertNull(result);
+        assertNull(result);
 
     }
 
@@ -115,12 +97,17 @@ public class GroupExpensesServiceImpTest {
 
         GroupExpensesInfoDTO result = groupExpensesService.addExpense(3L, Expense.builder().build());
 
-        Assertions.assertEquals(expected, result);
+        Assertions.assertEquals(expected.getExpensesList().size(), result.getExpensesList().size());
     }
 
     private GroupExpensesInfoDTO createGroupExpensesInfo(boolean hasExpenses) {
         if (hasExpenses) {
+            LinkedList<ConsumerDTO> consumers = new LinkedList<>();
             List<ExpenseInfoDTO> expensesInfoDTOList = new LinkedList<>();
+
+            consumers.add(0, ConsumerDTO.builder().id(1L).name("Alfonso Pérez").build());
+            consumers.add(1, ConsumerDTO.builder().id(6L).name("Raúl González").build());
+
             expensesInfoDTOList.add(ExpenseInfoDTO.builder()
                     .id(12L)
                     .amount(1f)
@@ -143,6 +130,7 @@ public class GroupExpensesServiceImpTest {
             return GroupExpensesInfoDTO.builder()
                     .groupId(3L)
                     .groupName("Grupo 2")
+                    .consumers(consumers)
                     .expensesList(expensesInfoDTOList)
                     .balance(balance)
                     .debts(new ArrayList<>())
@@ -162,8 +150,8 @@ public class GroupExpensesServiceImpTest {
 
     private GroupExpenses createGroupExpenses() {
         HashSet<Consumer> consumers = new HashSet<>();
-        consumers.add(new Consumer(1L, "Alfonso Pérez"));
         consumers.add(new Consumer(6L, "Raúl González"));
+        consumers.add(new Consumer(1L, "Alfonso Pérez"));
 
         return GroupExpenses.builder()
                 .id(3L)
@@ -175,7 +163,7 @@ public class GroupExpensesServiceImpTest {
     private LinkedList<Expense> createExpensesList() {
         LinkedList<Expense> expenseList = new LinkedList<>();
         expenseList.addLast(Expense.builder()
-                .id(12)
+                .id(12L)
                 .amount(1)
                 .description("dd")
                 .createTime(new Date(1602922874000L))
@@ -183,7 +171,7 @@ public class GroupExpensesServiceImpTest {
                 .groupExpenses(createGroupExpenses())
                 .build());
         expenseList.addLast(Expense.builder()
-                .id(13)
+                .id(13L)
                 .amount(1)
                 .description("dd")
                 .createTime(new Date(1602922874000L))

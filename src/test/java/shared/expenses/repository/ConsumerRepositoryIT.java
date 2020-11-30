@@ -1,13 +1,14 @@
 package shared.expenses.repository;
 
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import shared.expenses.pojo.Consumer;
 
 import javax.inject.Inject;
 import java.util.HashSet;
 import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @MicronautTest
 public class ConsumerRepositoryIT {
@@ -22,7 +23,7 @@ public class ConsumerRepositoryIT {
 
         Optional<Consumer> result = consumerRepository.findById(7L);
 
-        Assertions.assertEquals(expected, result.get());
+        assertEquals(expected, result.get());
     }
 
     @Test
@@ -32,6 +33,6 @@ public class ConsumerRepositoryIT {
 
         Consumer result = consumerRepository.update(expected);
 
-        Assertions.assertEquals(expected, result);
+        assertEquals(expected, result);
     }
 }

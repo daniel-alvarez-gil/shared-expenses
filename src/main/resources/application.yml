@@ -1,6 +1,9 @@
 micronaut:
   application:
     name: sharedExpenses
+  server:
+    cors:
+      enabled: true
 datasources:
   default:
     driverClassName: com.mysql.cj.jdbc.Driver

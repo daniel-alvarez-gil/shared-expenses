@@ -1,7 +1,6 @@
 package shared.expenses.repository;
 
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import shared.expenses.pojo.Consumer;
 import shared.expenses.pojo.Expense;
@@ -10,6 +9,8 @@ import shared.expenses.pojo.GroupExpenses;
 import javax.inject.Inject;
 import java.util.Date;
 import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 @MicronautTest
 public class ExpenseRepositoryIT {
@@ -20,20 +21,20 @@ public class ExpenseRepositoryIT {
     @Test
     void shouldReturnFiveItems() {
         List<Expense> result = expenseRepository.findAllByGroupExpensesOrderByCreateTimeDesc(2L);
-        Assertions.assertEquals(5, result.size());
+        assertEquals(5, result.size());
     }
 
     @Test
     void shouldReturnExpensesOrderByCreateTimeDesc() {
         List<Expense> result = expenseRepository.findAllByGroupExpensesOrderByCreateTimeDesc(2L);
-        Assertions.assertTrue(result.get(0).getCreateTime().after(result.get(4).getCreateTime()));
+        assertTrue(result.get(0).getCreateTime().after(result.get(4).getCreateTime()));
     }
 
     @Test
     void checkIfExpenseIsInserted() {
         Expense expected = createExpense();
         Expense result =  expenseRepository.save(expected);
-        Assertions.assertEquals(expected, result);
+        assertEquals(expected, result);
     }
 
     private Expense createExpense(){

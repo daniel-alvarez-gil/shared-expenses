@@ -36,44 +36,41 @@ public class GroupExpensesServiceImpl implements GroupExpensesService {
     @Transactional
     public GroupExpensesInfoDTO getGroupExpenseInfo(Long groupExpensesId) {
         Optional<GroupExpenses> optional = groupExpenseRepository.findById(groupExpensesId);
-        if (!optional.isPresent())
-            return null;
-
-        LinkedList<Expense> expenseList = expenseRepository.findAllByGroupExpensesOrderByCreateTimeDesc(optional.get().getId());
-        if(expenseList.isEmpty())
-            return GroupExpensesInfoDTO.builder()
-                    .groupId(optional.get().getId())
-                    .groupName(optional.get().getName())
-                    .consumers(getConsumersGroup(optional.get()))
-                    .build();
-
-        return getGroupExpenseInfoWithExpenses(optional.get(), expenseList);
+        return optional.map(this::getGroupExpensesInfoDTO).orElse(null);
     }
 
     @Transactional
-    public GroupExpensesInfoDTO addConsumerToGroup(Long groupExpensesId, Long consumerId) {
+    public GroupExpensesInfoDTO addConsumerToGroup(Long groupExpensesId,  String consumerName) {
         Optional<GroupExpenses> optional = groupExpenseRepository.findById(groupExpensesId);
         if (!optional.isPresent())
             return null;
 
-        Optional<Consumer> consumer = consumerRepository.findById(consumerId);
-        if (!consumer.isPresent())
-            return null;
+        HashSet<GroupExpenses> groupExpenses = new HashSet<>();
+        groupExpenses.add(GroupExpenses.builder().id(groupExpensesId).build());
 
-        consumer.get().getGroups().add(optional.get());
-        consumerRepository.update(consumer.get());
+        Consumer consumer = Consumer.builder().name(consumerName).groups(groupExpenses).build();
+        consumerRepository.save(consumer);
 
-        return GroupExpensesInfoDTO.builder()
-                .groupId(optional.get().getId())
-                .groupName(optional.get().getName())
-                .consumers(getConsumersGroup(optional.get(), consumer.get()))
-                .build();
+        addConsumersGroup(optional.get(), consumer);
+
+        return getGroupExpensesInfoDTO(optional.get());
     }
 
-    private LinkedList<ConsumerDTO> getConsumersGroup(GroupExpenses groupExpenses, Consumer consumer) {
-        LinkedList<ConsumerDTO> consumers = getConsumersGroup(groupExpenses);
-        consumers.add(ConsumerDTO.builder().id(consumer.getId()).name(consumer.getName()).build());
-        return consumers;
+    private GroupExpensesInfoDTO getGroupExpensesInfoDTO(GroupExpenses groupExpenses) {
+        LinkedList<Expense> expenseList = expenseRepository.findAllByGroupExpensesOrderByCreateTimeDesc(groupExpenses.getId());
+        if (expenseList.isEmpty())
+            return GroupExpensesInfoDTO.builder()
+                    .groupId(groupExpenses.getId())
+                    .groupName(groupExpenses.getName())
+                    .consumers(getConsumersGroup(groupExpenses))
+                    .build();
+
+        return getGroupExpenseInfoWithExpenses(groupExpenses, expenseList);
+    }
+
+    private void addConsumersGroup(GroupExpenses groupExpenses, Consumer consumer) {
+        groupExpenses.getConsumers()
+                .add(Consumer.builder().id(consumer.getId()).name(consumer.getName()).build());
     }
 
     private LinkedList<ConsumerDTO> getConsumersGroup(GroupExpenses groupExpenses){
@@ -101,6 +98,7 @@ public class GroupExpensesServiceImpl implements GroupExpensesService {
     private GroupExpensesInfoDTO getGroupExpenseInfoWithExpenses(GroupExpenses groupExpense, List<Expense> expenseList) {
         List<ExpenseInfoDTO> expensesInfoDTOList = new LinkedList<>();
         HashMap<String, Float> balance = new HashMap<>();
+        groupExpense.getConsumers().forEach(c -> balance.put(c.getName(), 0F));
         float totalExpenses = 0;
 
         for (Expense expense : expenseList) {
@@ -116,6 +114,7 @@ public class GroupExpensesServiceImpl implements GroupExpensesService {
         return GroupExpensesInfoDTO.builder()
                 .groupId(groupExpense.getId())
                 .groupName(groupExpense.getName())
+                .consumers(getConsumersGroup(groupExpense))
                 .expensesList(expensesInfoDTOList)
                 .balance(balance)
                 .debts(debts)
@@ -147,28 +146,24 @@ public class GroupExpensesServiceImpl implements GroupExpensesService {
 
     private void addExpenseToBalance(HashMap<String, Float> balance, Expense expense) {
         String key = expense.getPayer().getName();
-
-        if (balance.containsKey(key))
-            balance.replace(key, balance.get(key) + expense.getAmount());
-        else
-            balance.put(key, expense.getAmount());
+        balance.replace(key, balance.get(key) + expense.getAmount());
     }
 
     private void calculateDebts(HashMap<String, Float> balance) {
         Float Max_Value = Collections.max(balance.values());
         Float Min_Value = Collections.min(balance.values());
-        if (!Max_Value.equals(Min_Value)) {
+        if (!Max_Value.equals(Min_Value) && Min_Value.compareTo(-0.1F) != 0) {
             String Max_Key = Utils.getKeyFromValue(balance, Max_Value);
             String Min_Key = Utils.getKeyFromValue(balance, Min_Value);
             float result = Utils.round(Max_Value + Min_Value, 1);
             balance.remove(Max_Key);
             balance.remove(Min_Key);
             if (result >= ZERO) {
-                debts.add(String.format("%s -> %s (%.2f)", Min_Key, Max_Key, Utils.round(Math.abs(Min_Value), 2)));
+                debts.add(String.format("%s -> %s: (%.2f)", Min_Key, Max_Key, Utils.round(Math.abs(Min_Value), 2)));
                 balance.put(Max_Key, result);
                 balance.put(Min_Key, ZERO);
             } else {
-                debts.add(String.format("%s -> %s (%.2f)", Min_Key, Max_Key, Utils.round(Math.abs(Max_Value), 2)));
+                debts.add(String.format("%s -> %s: (%.2f)", Min_Key, Max_Key, Utils.round(Math.abs(Max_Value), 2)));
                 balance.put(Max_Key, ZERO);
                 balance.put(Min_Key, result);
             }

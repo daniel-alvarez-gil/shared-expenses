@@ -25,13 +25,14 @@ public class GroupExpensesController {
     @Post("/expenses")
     @Produces(MediaType.APPLICATION_JSON)
     public HttpResponse<GroupExpensesInfoDTO> createExpense(Long groupExpensesId, @Body Expense expense) {
+        expense.setId(null);
         return HttpResponse
                 .created(groupExpensesService.addExpense(groupExpensesId, expense));
     }
 
-    @Put("/consumer/{consumerId}")
-    public HttpResponse<GroupExpensesInfoDTO> addConsumerToGroup(Long groupExpensesId, Long consumerId) {
+    @Put("/consumer/{consumerName}")
+    public HttpResponse<GroupExpensesInfoDTO> addConsumerToGroup(Long groupExpensesId, String consumerName) {
         return HttpResponse
-                .created(groupExpensesService.addConsumerToGroup(groupExpensesId, consumerId));
+                .created(groupExpensesService.addConsumerToGroup(groupExpensesId, consumerName));
     }
 }

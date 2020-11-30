@@ -8,6 +8,8 @@ import shared.expenses.service.ConsumerService;
 import javax.inject.Singleton;
 import javax.transaction.Transactional;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Optional;
 
 @Singleton
@@ -33,4 +35,25 @@ public class ConsumerServiceImpl implements ConsumerService {
                 .groups(groups)
                 .build();
     }
+
+    public List<ConsumerDTO> findAll (){
+        LinkedList<ConsumerDTO> consumers = new LinkedList<>();
+        consumerRepository.findAll().forEach(consumer -> {
+            consumers.push(ConsumerDTO.builder()
+                    .id(consumer.getId())
+                    .name(consumer.getName())
+                    .build());
+        });
+
+        return consumers;
+
+    }
+
+
+
+
+
+
+
+
 }
